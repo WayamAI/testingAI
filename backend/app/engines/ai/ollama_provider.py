@@ -1,5 +1,6 @@
 import json
 import httpx
+from pydantic import ValidationError
 from app.core.config import get_settings
 from app.engines.ai.base import (
     AIProvider, AIProviderError, TestGenInput, GeneratedTestCase, FailureContext, FailureAnalysis,
@@ -44,16 +45,16 @@ class OllamaProvider(AIProvider):
                 resp.raise_for_status()
                 data = resp.json()
                 return data["message"]["content"]
-        except (httpx.HTTPError, KeyError, ConnectionError) as exc:
+        except (httpx.HTTPError, KeyError, ConnectionError, json.JSONDecodeError) as exc:
             raise AIProviderError(str(exc)) from exc
 
     async def generate_test_cases(self, input: TestGenInput) -> list[GeneratedTestCase]:
         content = await self._chat(_GENERATE_SYSTEM_PROMPT, input.requirement_text)
         try:
             raw = json.loads(content)
-        except json.JSONDecodeError as exc:
-            raise AIProviderError(f"non-JSON response: {exc}") from exc
-        return [GeneratedTestCase(**item) for item in raw]
+            return [GeneratedTestCase(**item) for item in raw]
+        except (json.JSONDecodeError, ValidationError, TypeError, KeyError) as exc:
+            raise AIProviderError(f"malformed response: {exc}") from exc
 
     async def analyze_failure(self, context: FailureContext) -> FailureAnalysis:
         user = (
@@ -63,6 +64,6 @@ class OllamaProvider(AIProvider):
         content = await self._chat(_ANALYZE_SYSTEM_PROMPT, user)
         try:
             raw = json.loads(content)
-        except json.JSONDecodeError as exc:
-            raise AIProviderError(f"non-JSON response: {exc}") from exc
-        return FailureAnalysis(**raw)
+            return FailureAnalysis(**raw)
+        except (json.JSONDecodeError, ValidationError, TypeError, KeyError) as exc:
+            raise AIProviderError(f"malformed response: {exc}") from exc

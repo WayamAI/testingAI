@@ -1,6 +1,6 @@
 import pytest
 from app.engines.ai.demo_provider import DemoAIProvider
-from app.engines.ai.base import TestGenInput, FailureContext
+from app.engines.ai.base import AIProviderError, TestGenInput, FailureContext
 from app.engines.ai.factory import generate_test_cases_with_fallback
 
 
@@ -35,7 +35,11 @@ async def test_factory_falls_back_to_demo_when_ollama_unreachable(monkeypatch):
     from app.engines.ai import ollama_provider
 
     async def broken_generate(self, input):
-        raise ConnectionError("simulated outage")
+        # OllamaProvider's own methods only ever raise AIProviderError (all
+        # transport/decode/validation failures are normalized to it inside
+        # the provider) — the factory's fallback contract is scoped to that
+        # exception type, so the simulated failure here matches that contract.
+        raise AIProviderError("simulated outage")
 
     monkeypatch.setattr(ollama_provider.OllamaProvider, "generate_test_cases", broken_generate)
 
