@@ -4,6 +4,9 @@ from app.database.mongo import ping_database
 from app.routes.auth import router as auth_router
 from app.routes.projects import router as projects_router
 from app.routes.ai import router as ai_router
+from app.routes.requirements import router as requirements_router
+from app.routes.test_cases import router as test_cases_router
+from app.routes.test_suites import router as test_suites_router
 
 app = FastAPI(title="WayamAI Testing Cloud API", version="0.1.0")
 
@@ -18,6 +21,9 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(projects_router)
 app.include_router(ai_router)
+app.include_router(requirements_router)
+app.include_router(test_cases_router)
+app.include_router(test_suites_router)
 
 
 @app.get("/api/health")
