@@ -1,3 +1,5 @@
+import "@testing-library/jest-dom/vitest";
+
 // Vitest's jsdom environment skips overriding `localStorage` on the global
 // object because Node.js (22+) ships its own experimental `localStorage`
 // global, which returns `undefined` unless started with
