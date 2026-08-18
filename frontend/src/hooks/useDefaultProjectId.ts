@@ -6,10 +6,6 @@ interface Project {
   name: string;
 }
 
-interface ProjectsResponse {
-  data: Project[];
-}
-
 /**
  * Hook to fetch and return the default project ID (first project from the API).
  * This is a known simplification for the current phase — full project-switching UI
@@ -26,8 +22,9 @@ export function useDefaultProjectId() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const { data } = await apiClient.get<ProjectsResponse>("/api/projects");
-        const firstProject = data.data?.[0];
+        const { data } = await apiClient.get<Project[]>("/api/projects");
+        // data is already the array (no envelope), so take first item's id
+        const firstProject = data[0];
         setProjectId(firstProject?.id || null);
       } catch (error) {
         console.error("Failed to fetch projects:", error);
