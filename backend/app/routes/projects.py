@@ -1,8 +1,12 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from app.schemas.project import ProjectCreate, ProjectOut
 from app.security.dependencies import get_current_user, get_current_org_scope
 from app.models.user import User
 from app.services import project_service
+from app.services import audit_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -12,6 +16,10 @@ async def create_project(payload: ProjectCreate, user: User = Depends(get_curren
     project = await project_service.create_project(
         user.organization_id, user.id, payload.name, payload.project_type
     )
+    try:
+        await audit_service.log_audit_event(user.organization_id, user.id, "project.create", "project", project.id)
+    except Exception as e:
+        logger.error("Failed to log audit event for project creation: %s", e)
     return ProjectOut(**project.model_dump())
 
 

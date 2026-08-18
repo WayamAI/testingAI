@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.mongo import ping_database
+from app.middleware.error_handler import install_error_handlers
 from app.routes.auth import router as auth_router
 from app.routes.projects import router as projects_router
 from app.routes.ai import router as ai_router
@@ -13,6 +14,8 @@ from app.routes.defects import router as defects_router
 from app.routes.quality import router as quality_router
 
 app = FastAPI(title="WayamAI Testing Cloud API", version="0.1.0")
+
+install_error_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,
