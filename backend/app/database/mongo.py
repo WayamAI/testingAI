@@ -18,6 +18,8 @@ def get_client() -> AsyncIOMotorClient:
     # from a previous loop would raise "Event loop is closed". Recreate the
     # client whenever the running loop has changed (or there is none cached).
     if _client is None or (current_loop is not None and _client_loop is not current_loop):
+        if _client is not None:
+            _client.close()
         _client = AsyncIOMotorClient(get_settings().mongodb_uri, serverSelectionTimeoutMS=3000)
         _client_loop = current_loop
     return _client
