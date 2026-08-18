@@ -12,6 +12,7 @@ from app.routes.test_runs import router as test_runs_router
 from app.routes.websocket_execution import router as ws_execution_router
 from app.routes.defects import router as defects_router
 from app.routes.quality import router as quality_router
+from app.routes.dashboard import router as dashboard_router
 
 app = FastAPI(title="WayamAI Testing Cloud API", version="0.1.0")
 
@@ -35,6 +36,7 @@ app.include_router(test_runs_router)
 app.include_router(ws_execution_router)
 app.include_router(defects_router)
 app.include_router(quality_router)
+app.include_router(dashboard_router)
 
 
 @app.get("/api/health")
