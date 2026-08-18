@@ -45,7 +45,7 @@ class OllamaProvider(AIProvider):
                 resp.raise_for_status()
                 data = resp.json()
                 return data["message"]["content"]
-        except (httpx.HTTPError, KeyError, ConnectionError, json.JSONDecodeError) as exc:
+        except (httpx.HTTPError, KeyError, ConnectionError, json.JSONDecodeError, TypeError) as exc:
             raise AIProviderError(str(exc)) from exc
 
     async def generate_test_cases(self, input: TestGenInput) -> list[GeneratedTestCase]:
