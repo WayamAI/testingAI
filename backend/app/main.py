@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.database.mongo import ping_database
 
 app = FastAPI(title="WayamAI Testing Cloud API", version="0.1.0")
 
@@ -14,4 +15,5 @@ app.add_middleware(
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok"}
+    db_ok = await ping_database()
+    return {"status": "ok", "database": "connected" if db_ok else "unreachable"}
