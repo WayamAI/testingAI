@@ -11,7 +11,7 @@ import { TestSuitesPage } from "./pages/TestSuitesPage";
 import { TestPlansPage } from "./pages/TestPlansPage";
 import { TestCyclesPage } from "./pages/TestCyclesPage";
 import { TestExplorerPage } from "./pages/TestExplorerPage";
-import { AiTestGeneratorPage } from "./pages/AiTestGeneratorPage";
+import { AITestGeneratorRoute } from "./pages/AITestGeneratorRoute";
 import { AiTestPlannerPage } from "./pages/AiTestPlannerPage";
 import { AiTestOptimizerPage } from "./pages/AiTestOptimizerPage";
 import { AiRegressionIntelligencePage } from "./pages/AiRegressionIntelligencePage";
@@ -185,7 +185,7 @@ function App() {
             <Route path="/test-plans" element={<TestPlansPage />} />
             <Route path="/test-cycles" element={<TestCyclesPage />} />
             <Route path="/test-explorer" element={<TestExplorerPage />} />
-            <Route path="/ai/test-generator" element={<AiTestGeneratorPage />} />
+            <Route path="/ai/test-generator" element={<AITestGeneratorRoute />} />
             <Route path="/ai/test-planner" element={<AiTestPlannerPage />} />
             <Route path="/ai/test-optimizer" element={<AiTestOptimizerPage />} />
             <Route path="/ai/regression-intelligence" element={<AiRegressionIntelligencePage />} />
