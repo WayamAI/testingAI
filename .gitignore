@@ -15,6 +15,9 @@ venv/
 backend/.venv/
 worker/.venv/
 
+# worktrees
+.worktrees/
+
 # os
 .DS_Store
 
