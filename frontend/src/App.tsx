@@ -12,6 +12,7 @@ import { TestPlansPage } from "./pages/TestPlansPage";
 import { TestCyclesPage } from "./pages/TestCyclesPage";
 import { TestExplorerPage } from "./pages/TestExplorerPage";
 import { AITestGeneratorRoute } from "./pages/AITestGeneratorRoute";
+import { TestRunPage } from "./pages/TestRunPage";
 import { AiTestPlannerPage } from "./pages/AiTestPlannerPage";
 import { AiTestOptimizerPage } from "./pages/AiTestOptimizerPage";
 import { AiRegressionIntelligencePage } from "./pages/AiRegressionIntelligencePage";
@@ -93,6 +94,7 @@ export const ROUTE_PATHS = [
   "/test-plans",
   "/test-cycles",
   "/test-explorer",
+  "/test-runs/:runId",
   "/ai/test-generator",
   "/ai/test-planner",
   "/ai/test-optimizer",
@@ -185,6 +187,7 @@ function App() {
             <Route path="/test-plans" element={<TestPlansPage />} />
             <Route path="/test-cycles" element={<TestCyclesPage />} />
             <Route path="/test-explorer" element={<TestExplorerPage />} />
+            <Route path="/test-runs/:runId" element={<TestRunPage />} />
             <Route path="/ai/test-generator" element={<AITestGeneratorRoute />} />
             <Route path="/ai/test-planner" element={<AiTestPlannerPage />} />
             <Route path="/ai/test-optimizer" element={<AiTestOptimizerPage />} />
