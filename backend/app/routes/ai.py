@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends
 from app.schemas.ai import (
     GenerateTestsRequest, GenerateTestsResponse, AnalyzeFailureRequest, AnalyzeFailureResponse,
@@ -9,6 +10,7 @@ from app.models.user import User
 from app.models.ai_request import AIRequest
 from app.database.mongo import get_database
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 
@@ -26,7 +28,10 @@ async def generate_tests(payload: GenerateTestsRequest, user: User = Depends(get
         output_summary=f"{len(cases)} test cases generated",
         created_by=user.id,
     )
-    await db.ai_requests.insert_one(record.model_dump(by_alias=True))
+    try:
+        await db.ai_requests.insert_one(record.model_dump(by_alias=True))
+    except Exception as exc:
+        logger.warning("Failed to persist AIRequest for test_generation: %s", exc)
     return GenerateTestsResponse(cases=cases, source=source)
 
 
@@ -48,5 +53,8 @@ async def analyze_failure(payload: AnalyzeFailureRequest, user: User = Depends(g
         output_summary=analysis.root_cause[:200],
         created_by=user.id,
     )
-    await db.ai_requests.insert_one(record.model_dump(by_alias=True))
+    try:
+        await db.ai_requests.insert_one(record.model_dump(by_alias=True))
+    except Exception as exc:
+        logger.warning("Failed to persist AIRequest for failure_analysis: %s", exc)
     return AnalyzeFailureResponse(analysis=analysis, source=source)
