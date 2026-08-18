@@ -1,9 +1,21 @@
 import { apiClient } from "./client";
 import { env } from "../../config/env";
 
-export async function createTestRun(suiteId: string) {
-  const { data } = await apiClient.post("/api/test-runs", { suite_id: suiteId });
-  return data as { id: string; status: string };
+export interface TestRun {
+  id: string;
+  project_id: string;
+  suite_id: string;
+  status: string;
+}
+
+export async function createTestRun(suiteId: string): Promise<TestRun> {
+  const { data } = await apiClient.post<TestRun>("/api/test-runs", { suite_id: suiteId });
+  return data;
+}
+
+export async function getTestRun(runId: string): Promise<TestRun> {
+  const { data } = await apiClient.get<TestRun>(`/api/test-runs/${runId}`);
+  return data;
 }
 
 export function executionSocketUrl(runId: string): string {

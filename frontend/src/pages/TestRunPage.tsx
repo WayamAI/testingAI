@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useExecutionSocket } from "../hooks/useExecutionSocket";
 import type { ExecutionEvent } from "../hooks/useExecutionSocket";
-import { useDefaultProjectId } from "../hooks/useDefaultProjectId";
 import { ExecutionTimeline } from "../components/execution/ExecutionTimeline";
 import { AIInsightBadge } from "../components/ai/AIInsightBadge";
-import { analyzeFailure, createDefect } from "../services/api/execution";
+import { analyzeFailure, createDefect, getTestRun } from "../services/api/execution";
 import type { FailureAnalysis } from "../services/api/execution";
 
 interface FailureAnalysisState {
@@ -35,8 +34,23 @@ function keyFor(event: ExecutionEvent, index: number): string {
 export function TestRunPage() {
   const { runId } = useParams<{ runId: string }>();
   const { events, status } = useExecutionSocket(runId ?? "");
-  const { projectId } = useDefaultProjectId();
+  const [projectId, setProjectId] = useState<string | null>(null);
   const [analyses, setAnalyses] = useState<Record<string, FailureAnalysisState>>({});
+
+  useEffect(() => {
+    if (!runId) return;
+    let cancelled = false;
+    getTestRun(runId)
+      .then((run) => {
+        if (!cancelled) setProjectId(run.project_id);
+      })
+      .catch(() => {
+        if (!cancelled) setProjectId(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [runId]);
 
   if (!runId) {
     return <p className="text-red-600">No run id provided.</p>;
