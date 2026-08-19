@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AITestGeneratorPage } from "./AITestGeneratorPage";
 import * as aiApi from "../services/api/ai";
@@ -15,9 +16,11 @@ describe("AITestGeneratorPage", () => {
   it("generates and displays test cases with a source badge", async () => {
     const client = new QueryClient();
     render(
-      <QueryClientProvider client={client}>
-        <AITestGeneratorPage projectId="proj1" />
-      </QueryClientProvider>
+      <MemoryRouter>
+        <QueryClientProvider client={client}>
+          <AITestGeneratorPage projectId="proj1" />
+        </QueryClientProvider>
+      </MemoryRouter>
     );
     fireEvent.change(screen.getByLabelText(/requirement/i), { target: { value: "Users can reset their password." } });
     fireEvent.click(screen.getByRole("button", { name: /generate/i }));

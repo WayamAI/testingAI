@@ -41,7 +41,22 @@ async def login_or_provision(email: str, password: str) -> tuple[str, User]:
 
 
 async def demo_login() -> tuple[str, User]:
+    """Resolve the canonical demo user seeded onto "Wayam Demo Organization".
+
+    `email` has no uniqueness constraint, so a stray demo@wayam.ai user from
+    an unrelated org (e.g. left over from local dev poking at the DB) could
+    otherwise be matched non-deterministically by a bare find_one. Prefer the
+    user attached to the seeded demo org; fall back to any demo@wayam.ai user
+    if the seed hasn't run yet, then to provisioning a fresh one.
+    """
     db = get_database()
+    seed_org = await db.organizations.find_one({"name": "Wayam Demo Organization"})
+    if seed_org:
+        seeded_user = await db.users.find_one({"organization_id": seed_org["_id"], "email": "demo@wayam.ai"})
+        if seeded_user:
+            user = User.model_validate(seeded_user)
+            return create_access_token(user.id, user.organization_id), user
+
     existing = await db.users.find_one({"email": "demo@wayam.ai"})
     if existing:
         user = User.model_validate(existing)

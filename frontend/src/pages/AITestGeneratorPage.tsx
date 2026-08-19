@@ -1,15 +1,20 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { generateTests } from "../services/api/ai";
 import type { GeneratedTestCase } from "../services/api/ai";
 import { createTestCase, createTestSuite, addCasesToSuite } from "../services/api/testing";
+import { createTestRun } from "../services/api/execution";
 import { AIInsightBadge } from "../components/ai/AIInsightBadge";
 
 export function AITestGeneratorPage({ projectId }: { projectId: string }) {
+  const navigate = useNavigate();
   const [requirementText, setRequirementText] = useState("");
   const [cases, setCases] = useState<GeneratedTestCase[]>([]);
   const [source, setSource] = useState<"ai" | "demo_fallback" | null>(null);
   const [accepted, setAccepted] = useState<Set<number>>(new Set());
   const [suiteCreated, setSuiteCreated] = useState<string | null>(null);
+  const [runStarting, setRunStarting] = useState(false);
+  const [runError, setRunError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     const resp = await generateTests(requirementText);
@@ -28,6 +33,20 @@ export function AITestGeneratorPage({ projectId }: { projectId: string }) {
     const suite = await createTestSuite(projectId, `Generated: ${requirementText.slice(0, 40)}`);
     await addCasesToSuite(suite.id, caseIds);
     setSuiteCreated(suite.id);
+  };
+
+  const handleRunSuite = async () => {
+    if (!suiteCreated) return;
+    setRunStarting(true);
+    setRunError(null);
+    try {
+      const run = await createTestRun(suiteCreated);
+      navigate(`/test-runs/${run.id}`);
+    } catch (err) {
+      setRunError(err instanceof Error ? err.message : "Failed to start run");
+    } finally {
+      setRunStarting(false);
+    }
   };
 
   return (
@@ -79,7 +98,19 @@ export function AITestGeneratorPage({ projectId }: { projectId: string }) {
           >
             Create Suite from Accepted ({accepted.size})
           </button>
-          {suiteCreated && <p className="text-sm text-green-600">Suite created: {suiteCreated}</p>}
+          {suiteCreated && (
+            <div className="space-y-2">
+              <p className="text-sm text-green-600">Suite created: {suiteCreated}</p>
+              <button
+                onClick={handleRunSuite}
+                disabled={runStarting}
+                className="rounded-md bg-brand-600 px-4 py-2 text-white hover:bg-brand-700 disabled:opacity-50"
+              >
+                {runStarting ? "Starting run…" : "Run Suite"}
+              </button>
+              {runError && <p className="text-sm text-red-600">{runError}</p>}
+            </div>
+          )}
         </div>
       )}
     </div>
