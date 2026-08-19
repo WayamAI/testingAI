@@ -56,8 +56,8 @@ import { QualityCoveragePage } from "./pages/QualityCoveragePage";
 import { QualityRiskAnalysisPage } from "./pages/QualityRiskAnalysisPage";
 import { QualityDefectsPage } from "./pages/QualityDefectsPage";
 import { QualityFlakyTestsPage } from "./pages/QualityFlakyTestsPage";
-import { QualityScorePage } from "./pages/QualityScorePage";
-import { QualityReleaseReadinessPage } from "./pages/QualityReleaseReadinessPage";
+import { QualityScoreRoute } from "./pages/QualityScoreRoute";
+import { ReleaseReadinessRoute } from "./pages/ReleaseReadinessRoute";
 import { QualityGatesPage } from "./pages/QualityGatesPage";
 import { IntegrationsGithubPage } from "./pages/IntegrationsGithubPage";
 import { IntegrationsGitlabPage } from "./pages/IntegrationsGitlabPage";
@@ -232,8 +232,8 @@ function App() {
             <Route path="/quality/risk-analysis" element={<QualityRiskAnalysisPage />} />
             <Route path="/quality/defects" element={<QualityDefectsPage />} />
             <Route path="/quality/flaky-tests" element={<QualityFlakyTestsPage />} />
-            <Route path="/quality/score" element={<QualityScorePage />} />
-            <Route path="/quality/release-readiness" element={<QualityReleaseReadinessPage />} />
+            <Route path="/quality/score" element={<QualityScoreRoute />} />
+            <Route path="/quality/release-readiness" element={<ReleaseReadinessRoute />} />
             <Route path="/quality/gates" element={<QualityGatesPage />} />
             <Route path="/integrations/github" element={<IntegrationsGithubPage />} />
             <Route path="/integrations/gitlab" element={<IntegrationsGitlabPage />} />
