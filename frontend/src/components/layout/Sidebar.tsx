@@ -5,9 +5,16 @@ import {
   Layers,
   Sparkles,
   Link2,
+  FlaskConical,
+  FileText,
+  Radar,
   Bug,
   Award,
   Rocket,
+  AlertTriangle,
+  Stethoscope,
+  Filter,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
@@ -23,8 +30,9 @@ export interface SidebarGroup {
 }
 
 // Authoritative nav tree for WayamAI Testing Cloud — pruned to Testing and
-// Quality only (sub-project 2 spec §2026-08-22 "real-testing-execution").
-// Every remaining item routes to a real, functional page — no stubs.
+// Quality only (sub-project 2 spec §2026-08-22 "real-testing-execution"),
+// extended with the sub-project 3 AI Test Intelligence capabilities.
+// Every item routes to a real, functional page — no stubs.
 export const SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     group: "Overview",
@@ -39,6 +47,9 @@ export const SIDEBAR_GROUPS: SidebarGroup[] = [
       { label: "Test Suites", path: "/test-suites", icon: Layers },
       { label: "AI Test Generator", path: "/ai/test-generator", icon: Sparkles },
       { label: "Connect Project", path: "/connect-project", icon: Link2 },
+      { label: "Repo Test Baseline", path: "/testing/baseline", icon: FlaskConical },
+      { label: "Doc-Driven Tests", path: "/testing/doc-driven", icon: FileText },
+      { label: "Live Test Runner", path: "/testing/live-runner", icon: Radar },
     ],
   },
   {
@@ -47,6 +58,10 @@ export const SIDEBAR_GROUPS: SidebarGroup[] = [
       { label: "Defects", path: "/quality/defects", icon: Bug },
       { label: "Quality Score", path: "/quality/score", icon: Award },
       { label: "Release Readiness", path: "/quality/release-readiness", icon: Rocket },
+      { label: "Defect Prediction", path: "/quality/defect-prediction", icon: AlertTriangle },
+      { label: "Root Cause Analysis", path: "/quality/root-cause", icon: Stethoscope },
+      { label: "Test Selection", path: "/quality/test-selection", icon: Filter },
+      { label: "Self-Healing", path: "/quality/self-heal", icon: Wrench },
     ],
   },
 ];
