@@ -12,8 +12,16 @@ class Settings(BaseSettings):
     ollama_base_url: str = "https://ollama.com"
     ollama_api_key: str = ""
     ollama_model: str = "gpt-oss:120b-cloud"
+    # Comma-separated list of allowed frontend origins for CORS. Defaults to
+    # local dev; set to the deployed frontend's real origin(s) in production
+    # (e.g. https://your-app.vercel.app) — see app/main.py's CORSMiddleware.
+    cors_origins: str = "http://localhost:5173"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
 
 @lru_cache
