@@ -35,3 +35,13 @@ async def ping_database() -> bool:
         return True
     except Exception:
         return False
+
+
+async def ensure_indexes() -> None:
+    """Real uniqueness constraints, not just application-level checks —
+    a bare find-then-insert in auth_service.login_or_provision was racy
+    without this: two near-simultaneous first-logins for the same email
+    could each pass the find_one check and insert a duplicate user in a
+    separate organization. Call once at startup."""
+    db = get_database()
+    await db.users.create_index("email", unique=True)
