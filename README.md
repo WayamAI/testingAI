@@ -162,6 +162,38 @@ cd frontend && npx tsc -b && npx oxlint && npx vite build
 cd frontend && npx playwright test
 ```
 
+## Sub-project 2: real testing & quality execution
+
+Sub-project 2 (spec: `docs/superpowers/specs/2026-08-22-real-testing-execution-design.md`)
+narrowed the product surface to **Testing and Quality only** — every other
+sidebar section (AI Testing, Web/API/Mobile Testing, Performance, Security,
+Data, Automation, Integrations, Administration) was removed along with its
+stub pages, and real execution capability was added:
+
+- **Connect Project** (`/connect-project`): paste a public git URL or
+  upload a ZIP. The platform clones/extracts it into an isolated
+  `backend/workspaces/{project_id}/` directory, detects its real stack
+  (currently: Node/Jest/Vitest via `package.json`, Python/PyTest via
+  `requirements.txt`/`pyproject.toml`), and shows the genuine result — or a
+  specific "no recognized test manifest" reason, never a guess.
+- **Run Tests** executes the connected project's own real test command as
+  a supervised subprocess (`SubprocessExecutionProvider`), parses its
+  native JSON/JUnit-XML report, and streams genuine pass/fail results over
+  the same WebSocket live-execution view sub-project 1 built — demo and
+  connected projects share the UI, never the data.
+- **Run Security Scan** runs real Semgrep (SAST) and pip-audit/npm audit
+  (dependency vulnerabilities) against the workspace, persists actual
+  findings, and folds them into the Quality Score's security sub-score
+  once a scan has run (previously a fixed placeholder).
+- **Run API Tests** discovers a real OpenAPI/Swagger spec in the connected
+  repo and executes real HTTP GET requests against a supplied base URL for
+  every parameter-free endpoint (parameterized endpoints are explicitly
+  skipped with a reason in this first cut, not faked).
+
+Deferred from this round: private repos, non-GET API testing, JUnit/Go-test
+etc. detection rules, and container/VM sandboxing (isolation is a per-project
+workspace directory plus a subprocess timeout, not a container boundary).
+
 ## What's implemented in this phase vs. deferred
 
 This build makes the primary demo journey real and persisted: **Login →

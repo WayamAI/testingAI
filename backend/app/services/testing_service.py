@@ -70,6 +70,30 @@ async def get_test_suite(org_id: str, suite_id: str) -> TestSuite | None:
     return TestSuite.model_validate(doc) if doc else None
 
 
+async def get_or_create_test_case_by_name(org_id: str, project_id: str, user_id: str, name: str) -> TestCase:
+    """Used by real execution providers that discover tests by running a
+    project's own test suite — a test with this exact title is reused
+    across runs instead of duplicated every time."""
+    db = get_database()
+    existing = await db.test_cases.find_one({"organization_id": org_id, "project_id": project_id, "title": name})
+    if existing:
+        return TestCase.model_validate(existing)
+
+    case = TestCase(
+        organization_id=org_id,
+        project_id=project_id,
+        title=name,
+        type="unit",
+        priority="medium",
+        expected_result="The test completes without error, per its own assertions.",
+        source="imported",
+        automation_status="automated",
+        created_by=user_id,
+    )
+    await db.test_cases.insert_one(case.model_dump(by_alias=True))
+    return case
+
+
 async def list_test_suites(org_id: str, project_id: str | None) -> list[TestSuite]:
     db = get_database()
     query = {"organization_id": org_id}

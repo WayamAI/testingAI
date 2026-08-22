@@ -1,5 +1,6 @@
 from app.database.mongo import get_database
 from app.services.defect_service import count_open_critical
+from app.services.security_service import has_run_scan, open_finding_counts
 
 
 async def _pass_rate(org_id: str, project_id: str) -> float:
@@ -19,9 +20,15 @@ async def compute_quality_score(org_id: str, project_id: str) -> dict:
 
     functional = round(pass_rate * 100)
     reliability = max(0, 100 - flaky * 5)
-    security = 92  # no security engine yet this sub-project; conservative fixed baseline
-    performance = 83  # same — no performance engine yet
-    accessibility = 79  # same — no accessibility engine yet
+
+    if await has_run_scan(org_id, project_id):
+        counts = await open_finding_counts(org_id, project_id)
+        security = max(0, 100 - counts["critical"] * 25 - counts["high"] * 12 - counts["medium"] * 4 - counts["low"] * 1)
+    else:
+        security = 92  # no scan run yet this project; conservative unverified baseline
+
+    performance = 83  # no performance engine this sub-project — still a fixed baseline (spec §21, deferred)
+    accessibility = 79  # no accessibility engine this sub-project — still a fixed baseline (spec §17, deferred)
     coverage = 94 if pass_rate > 0 else 0  # placeholder proxy until true coverage engine lands
 
     penalties = critical * 10

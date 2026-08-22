@@ -1,0 +1,16 @@
+{
+  "openapi": "3.0.0",
+  "info": {"title": "Fixture API", "version": "1.0.0"},
+  "paths": {
+    "/ping": {
+      "get": {"summary": "Health check", "responses": {"200": {"description": "OK"}}}
+    },
+    "/items/{item_id}": {
+      "get": {
+        "summary": "Get item by id",
+        "parameters": [{"name": "item_id", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "responses": {"200": {"description": "OK"}}
+      }
+    }
+  }
+}
