@@ -1,10 +1,6 @@
 """Feature 1: Repo Test Baseline — AI-generates categorized Playwright
 tests for a connected repo, incrementally re-scanning only what changed.
 """
-import asyncio
-import shutil
-from pathlib import Path
-
 from app.database.mongo import get_database
 from app.engines.ai.base import BaselineTestGenInput
 from app.engines.ai.factory import generate_baseline_tests_with_fallback
@@ -12,7 +8,7 @@ from app.intake.workspace import workspace_path
 from app.models.base import new_id
 from app.models.generated_test import GeneratedTest
 from app.services import git_mining, repo_summary
-from app.services.playwright_codegen import CATEGORIES
+from app.services.playwright_codegen import CATEGORIES, validate_js_syntax
 
 BASELINE_DIR_NAME = "wayam_baseline_tests"
 _CATEGORY_PATH_HINTS = {
@@ -39,15 +35,6 @@ def _infer_categories_from_changed_files(changed_files: list[str]) -> list[str]:
             if any(hint in lowered for hint in hints) and category not in matched:
                 matched.append(category)
     return matched or ["integration"]  # a real change with no keyword match still deserves a baseline check
-
-
-async def _validate_js_syntax(code: str) -> bool:
-    proc = await asyncio.create_subprocess_exec(
-        "node", "--check", "/dev/stdin",
-        stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL,
-    )
-    await proc.communicate(input=code.encode())
-    return proc.returncode == 0
 
 
 async def run_baseline_scan(org_id: str, user_id: str, project_id: str) -> dict:
@@ -86,7 +73,7 @@ async def run_baseline_scan(org_id: str, user_id: str, project_id: str) -> dict:
     rejected = 0
 
     for item in generated:
-        if not await _validate_js_syntax(item.code):
+        if not await validate_js_syntax(item.code):
             rejected += 1
             continue  # never persist AI output that isn't real, runnable code
 

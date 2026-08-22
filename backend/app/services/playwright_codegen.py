@@ -5,6 +5,7 @@ functional with zero AI configuration) and as the skeleton the real Ollama
 provider is asked to specialize. Every template is syntactically valid,
 runnable JS — never a string that merely looks like a test.
 """
+import asyncio
 import json
 
 CATEGORIES = [
@@ -106,3 +107,15 @@ def render_test(category: str, title: str) -> str:
         + rendered_body
         + "\n"
     )
+
+
+async def validate_js_syntax(code: str) -> bool:
+    """Real syntax validation via `node --check` — the shared gate every
+    AI-generated (or demo-templated) test must pass before persistence.
+    Never trust generated code as runnable just because it parsed as JSON."""
+    proc = await asyncio.create_subprocess_exec(
+        "node", "--check", "/dev/stdin",
+        stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL,
+    )
+    await proc.communicate(input=code.encode())
+    return proc.returncode == 0

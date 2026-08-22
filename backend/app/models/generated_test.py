@@ -11,5 +11,5 @@ class GeneratedTest(MongoDocument):
     confidence: float
     source: str  # ai|demo_fallback
     commit_sha: str | None = None
-    file_path: str  # where the .spec.js was written inside the workspace
+    file_path: str | None = None  # where the .spec.js was written, if a workspace exists
     origin: str = "baseline"  # baseline|doc_driven
