@@ -12,19 +12,34 @@ import { TestRunPage } from "./pages/TestRunPage";
 import { DefectsRoute } from "./pages/DefectsRoute";
 import { QualityScoreRoute } from "./pages/QualityScoreRoute";
 import { ReleaseReadinessRoute } from "./pages/ReleaseReadinessRoute";
+import { BaselinePage } from "./pages/BaselinePage";
+import { DocDrivenPage } from "./pages/DocDrivenPage";
+import { LiveRunnerPage } from "./pages/LiveRunnerPage";
+import { DefectPredictionPage } from "./pages/DefectPredictionPage";
+import { RootCausePage } from "./pages/RootCausePage";
+import { TestSelectionPage } from "./pages/TestSelectionPage";
+import { SelfHealPage } from "./pages/SelfHealPage";
 
-// Authoritative route list — sub-project 2 spec pruned this to Testing and
-// Quality only. Every path here is backed by a real page (see Sidebar.tsx).
+// Authoritative route list — sub-project 2 pruned this to Testing and
+// Quality only; sub-project 3 added the 7 AI Test Intelligence pages.
+// Every path here is backed by a real page (see Sidebar.tsx).
 export const ROUTE_PATHS = [
   "/dashboard",
   "/test-cases",
   "/test-suites",
   "/ai/test-generator",
   "/connect-project",
+  "/testing/baseline",
+  "/testing/doc-driven",
+  "/testing/live-runner",
   "/test-runs/:runId",
   "/quality/defects",
   "/quality/score",
   "/quality/release-readiness",
+  "/quality/defect-prediction",
+  "/quality/root-cause",
+  "/quality/test-selection",
+  "/quality/self-heal",
 ];
 
 const queryClient = new QueryClient();
@@ -42,10 +57,17 @@ function App() {
             <Route path="/test-suites" element={<TestSuitesRoute />} />
             <Route path="/ai/test-generator" element={<AITestGeneratorRoute />} />
             <Route path="/connect-project" element={<ConnectProjectPage />} />
+            <Route path="/testing/baseline" element={<BaselinePage />} />
+            <Route path="/testing/doc-driven" element={<DocDrivenPage />} />
+            <Route path="/testing/live-runner" element={<LiveRunnerPage />} />
             <Route path="/test-runs/:runId" element={<TestRunPage />} />
             <Route path="/quality/defects" element={<DefectsRoute />} />
             <Route path="/quality/score" element={<QualityScoreRoute />} />
             <Route path="/quality/release-readiness" element={<ReleaseReadinessRoute />} />
+            <Route path="/quality/defect-prediction" element={<DefectPredictionPage />} />
+            <Route path="/quality/root-cause" element={<RootCausePage />} />
+            <Route path="/quality/test-selection" element={<TestSelectionPage />} />
+            <Route path="/quality/self-heal" element={<SelfHealPage />} />
           </Route>
         </Routes>
       </AuthProvider>
