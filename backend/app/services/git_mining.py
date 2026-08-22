@@ -112,3 +112,17 @@ async def get_commit_diff(workspace: Path, sha: str) -> str:
     """Real `git show` diff for a single commit, truncated for prompt use."""
     raw = await _run_git(["show", "--stat", "-p", sha], workspace)
     return raw[:8000]
+
+
+async def get_head_sha(workspace: Path) -> str | None:
+    output = await _run_git(["rev-parse", "HEAD"], workspace)
+    sha = output.strip()
+    return sha or None
+
+
+async def get_changed_files(workspace: Path, since_sha: str) -> list[str]:
+    """Real `git diff --name-only` between since_sha and HEAD. Empty list
+    if since_sha is unreachable (e.g. history was rewritten) rather than
+    raising — callers treat that the same as "nothing changed"."""
+    output = await _run_git(["diff", "--name-only", f"{since_sha}..HEAD"], workspace)
+    return [line.strip() for line in output.splitlines() if line.strip()]

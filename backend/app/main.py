@@ -17,6 +17,7 @@ from app.routes.intake import router as intake_router
 from app.routes.security import router as security_router
 from app.routes.api_testing import router as api_testing_router
 from app.routes.defect_prediction import router as defect_prediction_router
+from app.routes.baseline import router as baseline_router
 from app.core.config import get_settings
 from app.seed.seed_demo import seed_demo_data
 
@@ -47,6 +48,7 @@ app.include_router(intake_router)
 app.include_router(security_router)
 app.include_router(api_testing_router)
 app.include_router(defect_prediction_router)
+app.include_router(baseline_router)
 
 
 @app.on_event("startup")

@@ -13,3 +13,6 @@ class Project(MongoDocument):
     # Flattened ApplicationProfile fields, populated once detection succeeds
     detected_language: str | None = None
     detected_test_framework: str | None = None
+    # Sub-project 3: tracks the last commit a baseline scan ran against,
+    # so re-scans can diff and append only new tests instead of duplicating.
+    baseline_last_scanned_commit: str | None = None
