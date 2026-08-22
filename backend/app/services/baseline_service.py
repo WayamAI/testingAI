@@ -1,6 +1,8 @@
 """Feature 1: Repo Test Baseline — AI-generates categorized Playwright
 tests for a connected repo, incrementally re-scanning only what changed.
 """
+from pathlib import Path
+
 from app.database.mongo import get_database
 from app.engines.ai.base import BaselineTestGenInput
 from app.engines.ai.factory import generate_baseline_tests_with_fallback
@@ -8,33 +10,33 @@ from app.intake.workspace import workspace_path
 from app.models.base import new_id
 from app.models.generated_test import GeneratedTest
 from app.services import git_mining, repo_summary
+from app.services.category_inference import infer_categories_from_changed_files
 from app.services.playwright_codegen import CATEGORIES, validate_js_syntax
 
 BASELINE_DIR_NAME = "wayam_baseline_tests"
-_CATEGORY_PATH_HINTS = {
-    "auth": ["auth", "login", "session", "password"],
-    "api": ["api", "route", "endpoint", "controller"],
-    "crud": ["model", "crud", "repository", "service"],
-    "ui_form": ["form"],
-    "ui_navigation": ["nav", "router", "page"],
-    "ui_component": ["component"],
-    "performance": ["perf"],
-    "accessibility": ["a11y", "accessib"],
-}
 
 
 class ProjectNotConnected(Exception):
     pass
 
 
-def _infer_categories_from_changed_files(changed_files: list[str]) -> list[str]:
-    matched: list[str] = []
-    for path in changed_files:
-        lowered = path.lower()
-        for category, hints in _CATEGORY_PATH_HINTS.items():
-            if any(hint in lowered for hint in hints) and category not in matched:
-                matched.append(category)
-    return matched or ["integration"]  # a real change with no keyword match still deserves a baseline check
+def _ensure_baseline_dir_gitignored(workspace: Path) -> None:
+    """Our AI-generated tests live inside the cloned working tree but must
+    never be picked up by the connected project's own `git add -A` — that
+    would silently pollute the user's real commits and, worse, corrupt
+    incremental-rescan diffs with our own artifacts (a real bug this
+    project's own tests caught). Appends an entry to .git/info/exclude
+    (local-only, never modifies the tracked .gitignore in the user's repo)."""
+    git_dir = workspace / ".git"
+    if not git_dir.is_dir():
+        return
+    exclude_file = git_dir / "info" / "exclude"
+    exclude_file.parent.mkdir(exist_ok=True)
+    entry = f"{BASELINE_DIR_NAME}/"
+    existing = exclude_file.read_text() if exclude_file.exists() else ""
+    if entry not in existing:
+        with exclude_file.open("a") as f:
+            f.write(f"\n{entry}\n")
 
 
 async def run_baseline_scan(org_id: str, user_id: str, project_id: str) -> dict:
@@ -54,7 +56,7 @@ async def run_baseline_scan(org_id: str, user_id: str, project_id: str) -> dict:
 
     if is_git and last_scanned and head_sha:
         changed = await git_mining.get_changed_files(workspace, last_scanned)
-        categories = _infer_categories_from_changed_files(changed) if changed else []
+        categories = infer_categories_from_changed_files(changed) if changed else []
         if not categories:
             return {"scan_id": None, "generated": 0, "source": "none", "categories_scanned": [], "message": "No file changes detected since the last baseline scan."}
     else:
@@ -67,6 +69,7 @@ async def run_baseline_scan(org_id: str, user_id: str, project_id: str) -> dict:
 
     baseline_dir = workspace / BASELINE_DIR_NAME
     baseline_dir.mkdir(exist_ok=True)
+    _ensure_baseline_dir_gitignored(workspace)
 
     scan_id = new_id()
     persisted: list[GeneratedTest] = []

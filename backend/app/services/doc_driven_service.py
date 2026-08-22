@@ -10,7 +10,7 @@ from app.intake.workspace import workspace_path
 from app.models.base import new_id
 from app.models.doc_upload import DocUpload
 from app.models.generated_test import GeneratedTest
-from app.services.baseline_service import BASELINE_DIR_NAME
+from app.services.baseline_service import BASELINE_DIR_NAME, _ensure_baseline_dir_gitignored
 from app.services.playwright_codegen import validate_js_syntax
 from app.services.document_parsing import extract_text
 
@@ -32,6 +32,7 @@ async def process_document(org_id: str, user_id: str, project_id: str, filename:
     baseline_dir = workspace / BASELINE_DIR_NAME if has_workspace else None
     if baseline_dir:
         baseline_dir.mkdir(exist_ok=True)
+        _ensure_baseline_dir_gitignored(workspace)
 
     db = get_database()
     scan_id = new_id()
