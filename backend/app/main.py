@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database.mongo import ping_database
+from app.database.mongo import ping_database, ensure_indexes
 from app.middleware.error_handler import install_error_handlers
 from app.routes.auth import router as auth_router
 from app.routes.projects import router as projects_router
@@ -63,6 +63,7 @@ app.include_router(live_runner_router)
 
 @app.on_event("startup")
 async def on_startup():
+    await ensure_indexes()
     if get_settings().demo_mode:
         await seed_demo_data()
 
