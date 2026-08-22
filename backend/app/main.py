@@ -21,6 +21,8 @@ from app.routes.baseline import router as baseline_router
 from app.routes.doc_driven import router as doc_driven_router
 from app.routes.root_cause import router as root_cause_router
 from app.routes.test_selection import router as test_selection_router
+from app.routes.self_heal import router as self_heal_router
+from app.routes.live_runner import router as live_runner_router
 from app.core.config import get_settings
 from app.seed.seed_demo import seed_demo_data
 
@@ -55,6 +57,8 @@ app.include_router(baseline_router)
 app.include_router(doc_driven_router)
 app.include_router(root_cause_router)
 app.include_router(test_selection_router)
+app.include_router(self_heal_router)
+app.include_router(live_runner_router)
 
 
 @app.on_event("startup")
