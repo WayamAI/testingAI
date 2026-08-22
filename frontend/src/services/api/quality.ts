@@ -27,3 +27,17 @@ export async function getReleaseReadiness(projectId: string): Promise<ReleaseRea
   const { data } = await apiClient.get<ReleaseReadinessOut>("/api/quality/release-readiness", { params: { project_id: projectId } });
   return data;
 }
+
+export interface DefectOut {
+  id: string;
+  project_id: string;
+  title: string;
+  severity: string;
+  priority: string;
+  status: string;
+}
+
+export async function listDefects(projectId: string): Promise<DefectOut[]> {
+  const { data } = await apiClient.get<DefectOut[]>("/api/defects", { params: { project_id: projectId } });
+  return data;
+}

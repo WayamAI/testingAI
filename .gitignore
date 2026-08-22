@@ -13,7 +13,14 @@ __pycache__/
 .venv/
 venv/
 backend/.venv/
+backend/.tools-venv/
 worker/.venv/
+
+# connected-project workspaces (real cloned/extracted user code, never committed)
+backend/workspaces/
+backend/tests/fixtures/**/node_modules/
+backend/tests/fixtures/**/.wayam-venv/
+backend/tests/fixtures/**/wayam-test-report.*
 
 # worktrees
 .worktrees/

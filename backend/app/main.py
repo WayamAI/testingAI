@@ -13,6 +13,9 @@ from app.routes.websocket_execution import router as ws_execution_router
 from app.routes.defects import router as defects_router
 from app.routes.quality import router as quality_router
 from app.routes.dashboard import router as dashboard_router
+from app.routes.intake import router as intake_router
+from app.routes.security import router as security_router
+from app.routes.api_testing import router as api_testing_router
 from app.core.config import get_settings
 from app.seed.seed_demo import seed_demo_data
 
@@ -39,6 +42,9 @@ app.include_router(ws_execution_router)
 app.include_router(defects_router)
 app.include_router(quality_router)
 app.include_router(dashboard_router)
+app.include_router(intake_router)
+app.include_router(security_router)
+app.include_router(api_testing_router)
 
 
 @app.on_event("startup")

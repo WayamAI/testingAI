@@ -1,2 +1,5 @@
 [tool.pytest.ini_options]
 python_classes = "NoPytestClassCollection"
+# tests/fixtures/ holds real target projects (their own real test suites)
+# used as fixtures by our own tests — never collect them as our suite.
+norecursedirs = ["tests/fixtures"]
